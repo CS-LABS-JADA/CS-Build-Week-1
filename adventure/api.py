@@ -8,6 +8,8 @@ from .models import *
 from rest_framework.decorators import api_view
 import json
 
+from util.our_world import CreateWorld
+
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
 
@@ -65,3 +67,12 @@ def move(request):
 def say(request):
     # IMPLEMENT
     return JsonResponse({'error':"Not yet implemented"}, safe=True, status=500)
+
+@csrf_exempt
+@api_view(["POST"])
+def create_rooms(request):
+    data = json.loads(request.body)
+    # import pdb; pdb.set_trace()
+    num_of_rooms = data['num_rooms']
+    CreateWorld(num_of_rooms)
+    return JsonResponse({'rooms created':num_of_rooms}, safe=True, status=204)
