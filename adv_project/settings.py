@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'adv_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-if config('isLocal'):
+if config('isLocal', cast=bool):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
