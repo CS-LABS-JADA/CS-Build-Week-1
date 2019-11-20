@@ -13,5 +13,5 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('api/adv/', include('adventure.urls')),
     path('api/login/', views.obtain_auth_token),
-    path('api/register/', include('rest_auth.urls')),
+    path('api/register/', include('rest_auth.urls'))
 ]
