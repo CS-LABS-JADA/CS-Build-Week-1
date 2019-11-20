@@ -40,15 +40,15 @@ class CreateWorld:
         if home_start and getattr(home, f"{check_dir}_to", 0) == 0:
             # print("add room to HOME dir")
             room = Room(rooms_created, "A Generic Room", "This is a generic room.")
-            # setattr(home, f"{check_dir}_to", room.id)
-            # setattr(room, f"{rvcheck_dir}_to", home.id)
+            setattr(home, f"{check_dir}_to", room.id)
+            setattr(room, f"{rvcheck_dir}_to", home.id)
             room.save()
             home.save()
         elif getattr(prev_room, f"{check_dir}_to", 0) == 0:
             # print("add room to dir")
             room = Room(rooms_created, "A Generic Room", "This is a generic room.")
-            # setattr(prev_room, f"{check_dir}_to", room.id)
-            # setattr(room, f"{rvcheck_dir}_to", prev_room.id)
+            setattr(prev_room, f"{check_dir}_to", room.id)
+            setattr(room, f"{rvcheck_dir}_to", prev_room.id)
             prev_room.save()
             room.save()
         else:
