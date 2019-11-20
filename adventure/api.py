@@ -6,6 +6,7 @@ from decouple import config
 from django.contrib.auth.models import User
 from .models import *
 from rest_framework.decorators import api_view
+from adventure.models import Room
 import json
 
 from util.our_world import CreateWorld
@@ -76,3 +77,13 @@ def create_rooms(request):
     num_of_rooms = data['num_rooms']
     CreateWorld(num_of_rooms)
     return JsonResponse({'rooms created':num_of_rooms}, safe=True, status=204)
+
+@csrf_exempt
+@api_view(["GET"])
+def get_rooms(request):
+    the_rooms = Room.objects.all()
+    rooms_to_send = {}
+    for room in the_rooms:
+        rooms_to_send[room.id] = {"title":room.title, "desc":room.description, "n_to":room.n_to, "e_to":room.e_to, "s_to":room.s_to, "w_to":room.w_to}
+    # import pdb; pdb.set_trace()
+    return JsonResponse({'rooms':rooms_to_send}, safe=True, status=200)
