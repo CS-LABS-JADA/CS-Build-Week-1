@@ -84,6 +84,6 @@ def get_rooms(request):
     the_rooms = Room.objects.all()
     rooms_to_send = {}
     for room in the_rooms:
-        rooms_to_send[room.id] = {"title":room.title, "desc":room.description, "n_to":room.n_to, "e_to":room.e_to, "s_to":room.s_to, "w_to":room.w_to}
+        rooms_to_send[room.id] = {"title":room.title, "desc":room.description, "x":room.x, "y":room.y, "n_to":room.n_to, "e_to":room.e_to, "s_to":room.s_to, "w_to":room.w_to}
     # import pdb; pdb.set_trace()
     return JsonResponse({'rooms':rooms_to_send}, safe=True, status=200)
