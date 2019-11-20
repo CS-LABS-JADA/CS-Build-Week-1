@@ -12,7 +12,7 @@ class CreateWorld:
 
     def place_maze_with_validation(self, rooms_created, prev_room, home, home_start, x, y):
         if home == None:
-            room = Room(rooms_created, "A Generic Room", "This is a generic room.")
+            room = Room(rooms_created, f"This is room {rooms_created}", f"This is a generic room called {rooms_created}.")
             room.save()
             self.grid_view[(x,y)] = room.id
             return {"rooms_created": rooms_created, "prev_room": room}
@@ -30,7 +30,7 @@ class CreateWorld:
             x += dir_values[check_dir]
             
         if home_start and getattr(home, f"{check_dir}_to", 0) == 0:
-            room = Room(rooms_created, "A Generic Room", "This is a generic room.")
+            room = Room(rooms_created, f"This is room {rooms_created}", f"This is a generic room called {rooms_created}.")
             setattr(home, f"{check_dir}_to", room.id)
             setattr(room, f"{rvcheck_dir}_to", home.id)
             self.grid_view[(x,y)] = room.id
@@ -42,7 +42,7 @@ class CreateWorld:
                 nxt_rm = Room.objects.filter(id=rm_id)[0]
                 return self.place_maze_with_validation(rooms_created, nxt_rm, home, False, x, y)
             else:
-                room = Room(rooms_created, "A Generic Room", "This is a generic room.")
+                room = Room(rooms_created, f"This is room {rooms_created}", f"This is a generic room called {rooms_created}.")
                 setattr(prev_room, f"{check_dir}_to", room.id)
                 setattr(room, f"{rvcheck_dir}_to", prev_room.id)
                 self.grid_view[(x,y)] = room.id
