@@ -63,9 +63,9 @@ class CreateWorld:
         home = None
         rooms_created = 1
         while rooms_to_create >= rooms_created:
-            returned_vals = self.place_room(rooms_created, prev_room)
             returned_vals = self.place_maze_with_validation(rooms_created, prev_room, home, True, 0, 0)
             rooms_created = returned_vals["rooms_created"]
             prev_room = returned_vals["prev_room"]
             if rooms_created == 1:
+                home = prev_room
             rooms_created += 1
