@@ -10,6 +10,8 @@ from adventure.models import Room
 import json
 
 from util.our_world import CreateWorld
+# from rest_framework.authtoken.models import Token
+from django.contrib.auth import logout
 
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
@@ -87,3 +89,4 @@ def get_rooms(request):
         rooms_to_send[room.id] = {"title":room.title, "desc":room.description, "x":room.x, "y":room.y, "n_to":room.n_to, "e_to":room.e_to, "s_to":room.s_to, "w_to":room.w_to}
     # import pdb; pdb.set_trace()
     return JsonResponse({'rooms':rooms_to_send}, safe=True, status=200)
+
