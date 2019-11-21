@@ -6,75 +6,70 @@ import secrets
 class CreateWorld:
     def __init__(self, num_rooms):
         self.num_rooms = num_rooms
+        self.open_spaces = []
         self.grid_view = {}
 
         self.create_rooms()
+    
+    def get_edges(self, room):
+        # print(f"ROOM: {room.id}")
+        if getattr(room, f"n_to", 0) == 0:
+            self.open_spaces.append((room.id, "n"))
+        if getattr(room, f"e_to", 0) == 0:
+            self.open_spaces.append((room.id, "e"))
+        if getattr(room, f"s_to", 0) == 0:
+            self.open_spaces.append((room.id, "s"))
+        if getattr(room, f"w_to", 0) == 0:
+            self.open_spaces.append((room.id, "w"))
 
-    def place_maze_with_validation(self, rooms_created, prev_room, home, home_start, x, y):
-        # print(f"\nSTART ROOM CREATION")
-        if home == None:
-            # print(f"\nSET HOME")
+    def place_maze_with_validation(self, rooms_created):
+        x=0; y=0
+        if rooms_created == 1:
             room = Room(rooms_created, f"This is room {rooms_created}", f"This is a generic room called {rooms_created}.", x, y)
             room.save()
-            self.grid_view[(x,y)] = room.id
-            return {"prev_room": room}
-
-        rm_dir = ["n", "e", "w", "s"]
-        rvrm_dir = ["s", "w", "e", "n"]
-        ran = secrets.randbelow(4)
-        check_dir = rm_dir[ran]
-        rvcheck_dir = rvrm_dir[ran]
-        dir_values = {"n":1, "e":1, "w":-1, "s":-1}
-
-        if check_dir == "n" or check_dir == "s":
-            y += dir_values[check_dir]
-        elif check_dir == "e" or check_dir == "w":
-            x += dir_values[check_dir]
-            
-        if home_start and getattr(home, f"{check_dir}_to", 0) == 0:
-            # print(f"\nSTART FROM HOME")
-            room = Room(rooms_created, f"This is room {rooms_created}", f"This is a generic room called {rooms_created}.", x, y)
-            room.save()
-            home.connectRooms(room, check_dir)
-            room.connectRooms(home, rvcheck_dir)
-            self.grid_view[(x,y)] = room.id
-        elif getattr(prev_room, f"{check_dir}_to", 0) == 0:
-            # print(f"\nROOM DIRECTION EMPTY")
+            self.get_edges(room)
+            self.grid_view[(x,y)] = True
+            return
+        
+        max = len(self.open_spaces)
+        rand = secrets.randbelow(max)
+        rev_dir = {"n":"s", "e":"w", "s":"n", "w":"e"}
+        dir_val = {"n":1, "e":1, "s":-1, "w":-1}
+        if self.open_spaces[rand] is not None:
+            rm_id = self.open_spaces[rand][0]
+            curr_rm = Room.objects.filter(id=rm_id)[0]
+            rm_dir = self.open_spaces[rand][1]
+            x = getattr(curr_rm, "x", 0)
+            y = getattr(curr_rm, "y", 0)
+            if rm_dir == "n" or rm_dir == "s":
+                y += dir_val[rm_dir]
+            if rm_dir == "w" or rm_dir == "e":
+                x += dir_val[rm_dir]
             if (x,y) in self.grid_view:
-                # print(f"\nROOM EXISTS SO CANNOT PLACE")
-                rm_id = self.grid_view[(x,y)]
-                nxt_rm = Room.objects.filter(id=rm_id)[0]
-                return self.place_maze_with_validation(rooms_created, nxt_rm, home, False, x, y)
+                # print("can't place recurse")
+                del self.open_spaces[rand]
+                self.place_maze_with_validation(rooms_created)
             else:
-                # print(f"\nPLACE ROOM AT DIRECTION")
+                # print("place in space")
                 room = Room(rooms_created, f"This is room {rooms_created}", f"This is a generic room called {rooms_created}.", x, y)
                 room.save()
-                prev_room.connectRooms(room, check_dir)
-                room.connectRooms(prev_room, rvcheck_dir)
-                self.grid_view[(x,y)] = room.id
+                rev_rm_dir = rev_dir[self.open_spaces[rand][1]]
+                curr_rm.connectRooms(room, rm_dir)
+                room.connectRooms(curr_rm, rev_rm_dir)
+                del self.open_spaces[rand]
+                self.get_edges(room)
         else:
-            # print(f"\nROOM EXISTS")
-            rm_id = getattr(prev_room, f"{check_dir}_to", 0)
-            # print(f"\nROOM: {prev_room.id} | DIRECTIONAL ROOM ID: {rm_id}")
-            # pdb.set_trace()
-            nxt_rm = Room.objects.filter(id=rm_id)[0]
-            # pdb.set_trace()
-            return self.place_maze_with_validation(rooms_created, nxt_rm, home, False, x, y)
-        return {"prev_room":room}
+            self.place_maze_with_validation(rooms_created)
 
 
     def create_rooms(self):
         Room.objects.all().delete()
 
         rooms_to_create = self.num_rooms
-        prev_room = None
-        home = None
         rooms_created = 1
         while rooms_to_create >= rooms_created:
             # print(f"\n~~~~~~~~~~\nWHILE START room: {rooms_created}\n")
-            returned_vals = self.place_maze_with_validation(rooms_created, prev_room, home, True, 0, 0)
-            prev_room = returned_vals["prev_room"]
-            if rooms_created == 1:
-                home = prev_room
+            self.place_maze_with_validation(rooms_created)
             rooms_created += 1
+            # print(f"self.open_spaces: {self.open_spaces}")
             # print(f"\nWHILE END\n~~~~~~~~~~\n")
