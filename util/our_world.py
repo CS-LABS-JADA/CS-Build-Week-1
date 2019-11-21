@@ -3,6 +3,8 @@ from adventure.models import Player, Room
 import pdb
 import secrets
 
+from datetime import datetime
+
 class CreateWorld:
     def __init__(self, num_rooms):
         self.num_rooms = num_rooms
@@ -57,6 +59,7 @@ class CreateWorld:
                 curr_rm.connectRooms(room, rm_dir)
                 room.connectRooms(curr_rm, rev_rm_dir)
                 del self.open_spaces[rand]
+                self.grid_view[(x,y)] = True
                 self.get_edges(room)
         else:
             self.place_maze_with_validation(rooms_created)
@@ -67,9 +70,12 @@ class CreateWorld:
 
         rooms_to_create = self.num_rooms
         rooms_created = 1
+        start_time = datetime.today()
         while rooms_to_create >= rooms_created:
             # print(f"\n~~~~~~~~~~\nWHILE START room: {rooms_created}\n")
             self.place_maze_with_validation(rooms_created)
             rooms_created += 1
             # print(f"self.open_spaces: {self.open_spaces}")
             # print(f"\nWHILE END\n~~~~~~~~~~\n")
+        end_time = datetime.today()
+        print(f"Start: {start_time} | End: {end_time} | Delta: {end_time - start_time}")
